@@ -1,5 +1,5 @@
 flask==3.0.3
 flask-cors==5.0.0
 opencv-python-headless==4.10.0.84
-mediapipe==0.10.14
+mediapipe>=0.10.14
 gunicorn==22.0.0
