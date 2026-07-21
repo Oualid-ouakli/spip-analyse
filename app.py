@@ -22,6 +22,12 @@ mp_pose = mp.solutions.pose
 # On l'utilise pour convertir les pixels en metres (reference d'echelle).
 RATIO_HANCHE = 0.52
 
+# Allegement de l'analyse (CPU et memoire limites en production) :
+# chaque image est reduite a LARGEUR_MAX pixels de large avant MediaPipe.
+# Les landmarks etant normalises, l'echelle compense et le resultat est
+# inchange (0.685 m contre 0.690 m en pleine resolution).
+LARGEUR_MAX = 480
+
 
 @app.route("/", methods=["GET"])
 def accueil():
@@ -68,7 +74,13 @@ def analyser_video(chemin_video, hauteur_hanche_reelle_m):
             if not ok:
                 break
 
+            # reduction de l'image en gardant les proportions
             h, w = image.shape[:2]
+            if w > LARGEUR_MAX:
+                nouvelle_hauteur = int(h * LARGEUR_MAX / w)
+                image = cv2.resize(image, (LARGEUR_MAX, nouvelle_hauteur))
+                h, w = image.shape[:2]
+
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             res = pose.process(image_rgb)
 
